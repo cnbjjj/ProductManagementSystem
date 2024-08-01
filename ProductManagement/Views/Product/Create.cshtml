@@ -1,0 +1,28 @@
+﻿@model Product
+
+@{
+    ViewData["Title"] = "Add Product";
+    var FormView = new
+    {
+        FormData = new
+        {
+            title = new { type = "text", value = "" },
+            category = new { type = "text", value = "" },
+            price = new { type = "number", value = "" },
+            quantity = new { type = "number", value = "" },
+            image = new { type = "text", value = "", require = false },
+            description = new { type = "text", value = "", require = false },
+        },
+        Btn = "Add"
+    };
+}
+
+<h3 class="my-5">@ViewData["Title"]</h3>
+
+<partial name="_FormViewForModels" model="FormView" />
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

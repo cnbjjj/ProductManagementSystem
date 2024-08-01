@@ -1,0 +1,91 @@
+﻿@model dynamic
+@*
+    This partial view is used to render model atrributes into form fields.
+    The model is defined as dynamic to allow the use of any model.
+    It is a dynamic object that contains key-value pairs.
+    Each key maps to an object with the following structure:
+    FormData: dynamic
+    {
+        Key: {
+            type: string,       // The type of the property (e.g., "text", "number").
+            value: dynamic,     // The value of the property, which can be of any type.
+            require: bool       // A boolean indicating whether the property is required.
+        }
+    }
+
+*@
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+@foreach(var prop in Model.GetType().GetProperties())
+{
+    var PropName = prop.Name;
+    var PropValue = prop.GetValue(Model);
+    var type = PropValue.type;
+    var value = PropValue.value;
+    var requireProperty = PropValue.GetType().GetProperty("require");
+    var require = requireProperty != null ? (bool)requireProperty.GetValue(PropValue) : true;
+    var requireString = require ? "required" : "";
+    var warningString = $"{PropName} is required.";
+    <div class="mb-2">
+        @if (type == "hidden")
+        {
+            <input type="hidden" id="@PropName" name="@PropName" value="@value" />
+        }
+        else
+        {
+            @Html.Label((string)PropName, null, new { @class = "form-label" })
+        }
+        @if (type == "dropdown")
+        {
+            <select 
+                id="@PropName" 
+                name="@PropName" 
+                class="form-control" 
+                autocomplete="off" 
+                data-val="@require.ToString().ToLower()" 
+                data-val-required="@warningString" @requireString>
+                <option value="">Select</option>
+                @foreach (var item in (IEnumerable<SelectListItem>)value)
+                {
+                    <option 
+                        value="@item.Value" 
+                        selected="@(item.Selected ? "selected" : null)">
+                        @item.Text
+                    </option>
+                }
+            </select>
+        }
+        else if (type == "textarea")
+        {
+            <textarea 
+                id="@PropName" 
+                name="@PropName" 
+                autocomplete="off" 
+                class="form-control" 
+                data-val="@require.ToString().ToLower()" 
+            data-val-required="@warningString" @requireString>@value</textarea>
+        }
+        else if (type== "file")
+        {
+            <input type="file"
+                id="@PropName"
+                name="@PropName"
+                   class="form-control"
+                   data-val="@require.ToString().ToLower()" 
+                data-val-required="@warningString" @requireString />
+        }
+        else
+        {
+            <input
+                type="@type" 
+                id="@PropName" 
+                name="@PropName" 
+                value="@value" 
+                autocomplete="off" 
+                class="form-control" 
+                data-val="@require.ToString().ToLower()" 
+                data-val-required="@warningString"  @requireString/>
+        }
+        @Html.ValidationMessage((string)PropName, "", new { @class = "text-danger form-text" })
+    </div> 
+}
+

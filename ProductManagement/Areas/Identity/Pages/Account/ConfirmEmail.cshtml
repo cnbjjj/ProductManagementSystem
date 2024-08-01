@@ -1,0 +1,9 @@
+﻿@page
+@model ConfirmEmailModel
+@{
+    ViewData["Title"] = "Confirm email";
+    Response.Redirect("./Login");
+}
+
+<h3 class="my-5">@ViewData["Title"]</h3>
+<partial name="_StatusMessage" model="Model.StatusMessage" />

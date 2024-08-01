@@ -1,0 +1,102 @@
+﻿@model IEnumerable<Product>
+
+@{
+    ViewData["Title"] = "Products";
+    var DeleteMessage = "Are you sure you want to delete the record?";
+}
+
+<div class="d-flex justify-content-between align-content-center align-items-center">
+    <h3 class="my-5">@ViewData["Title"]</h3>
+    <div class="btn-group">
+        <a href="@Url.Action("ImportProducts")" class="btn btn-light btn-secondary"><i class="bi bi-download"></i></a>
+        <a href="@Url.Action("Create")" class="btn btn-success bi bi-plus-lg"></a>
+    </div>
+</div>
+<table class="table ps-0">
+    <thead>
+        <tr class="p-3 d-flex mb-2 align-items-center bg-light text-uppercase">
+            <th>
+                <b>id</b>
+            </th>
+            <th>
+                <b>image</b>
+            </th>
+            <th>
+                <b>name</b>
+            </th>
+            <th>
+                <b>category</b>
+            </th>
+            <th>
+                <b>description</b>
+            </th>
+            <th>
+                <b>price</b>
+            </th>
+            <th>
+                <b>quantity</b>
+            </th>
+            <th>
+                <b>Actions</b>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="p-3 d-flex align-items-center mb-2 product">
+                <td>
+                    <b>#@item.id</b>
+                </td>
+                <td class="product-image">
+                    <img src="@(item.image==null?Url.Content("~/img/no-image.png"):item.image)" alt="" />
+                </td>
+                <td class="text-truncate">
+                    @item.title
+                </td>
+                <td>
+                    @item.category
+                </td>
+                <td class="text-truncate">
+                    @item.description
+                </td>
+                <td>
+                    @item.price
+                </td>
+                <td class="btn-group btn-quantity-group" role="group" data-id="@item.id">
+                    <button type="button" class="btn btn-light btn-min" data-id="@item.id">-</button>
+                    <input type="text" id="product-@item.id" class="col-sm-4 text-center border-0 txt mx-1" value="@item.quantity" data-id="@item.id" />
+                    <button type="button" class="btn btn-light btn-add bi bi-plus" data-id="@item.id"></button>
+                </td>
+                <td class="btn-group">
+                    <a href="@Url.Action("Edit",new{id=@item.id})" class="btn btn-success bi bi-pencil"></a>
+                    <a href="@Url.Action("Delete",new{id=@item.id})" class="btn btn-danger bi bi-trash3" onclick="return deleteItem(this.href)" data-bs-toggle="modal" data-bs-target="#confirmModal"></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@if(Model.Count()<=0)
+{
+    <div class="text-center py-5">No Data Available, Click to <a href="@Url.Action("ImportProducts")" class="btn btn-light btn-secondary"><i class="bi bi-download"></i></a> Import Product.</div>
+}
+else
+{
+    <div>
+        
+    </div>
+}
+@if(ViewBag.TotalPages > 1)
+{
+     <nav>
+        <ul class="pagination justify-content-center">
+            @for(int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i==ViewBag.PageNum?"active":"")">
+                    <a class="page-link" href="@Url.Action("Page","Product",new {PageNum=i})">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+<partial name="_ConfirmModal" model="DeleteMessage" />

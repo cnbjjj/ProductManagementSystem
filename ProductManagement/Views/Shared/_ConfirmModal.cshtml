@@ -1,0 +1,18 @@
+﻿@model string
+@*
+    This will render a modal that will ask the user if they are sure they want to proceed with the action.
+    @Model: The message to be displayed in the modal.
+*@
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body p-5">
+                @(Model != null ? Model : "Are you sure you want to proceed?")
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-light" data-bs-dismiss="modal">Cancel</a>
+                <a class="btn btn-danger btn-proceed">Proceed</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,30 @@
+﻿@model dynamic
+@* 
+    This partial view is used to render the form view for the models.
+    It is used to render the form view for the models.
+    The form view is rendered using the _Form partial view.
+    The form buttons are rendered using the _FormBtn partial view.
+    The model is defined as dynamic to allow the use of any model.
+    The structure of the model is as follows:
+
+        Model: dynamic
+        {
+            FormData: dynamic
+            {
+                Key: {
+                    type: string,       // The type of the property (e.g., "text", "number").
+                    value: dynamic,     // The value of the property, which can be of any type.
+                    require: bool       // A boolean indicating whether the property is required.
+                }
+            },
+            Btn: string                 // The name of the button.
+        }
+
+*@
+<div class="col-5">
+    @using (Html.BeginForm())
+    {
+        <partial name="_Form" model="@Model.FormData" />
+        <partial name="_FormBtn" model="@Model.Btn" />
+    }
+</div>

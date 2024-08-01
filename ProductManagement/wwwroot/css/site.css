@@ -1,0 +1,140 @@
+html {
+    font-size: 14px;
+}
+
+:root {
+    --font-color:#000;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+    font-family: "Poppins", sans-serif;
+    font-weight: 200;
+    font-style: normal;
+}
+
+table {
+    table-layout: fixed;
+}
+
+td,th {
+    width: 100%;
+    border: none;
+    text-align:center;
+}
+
+tr {
+    box-shadow: 1px 1px 6px 0px rgba(0, 0, 0, 0.1);
+    td:first-child,th:first-child{
+        width:20%;
+    }
+}
+
+.btn {
+    margin:0 0.1em;
+}
+
+.sbtn {
+        min-width: 120px;
+}
+
+a {
+    text-decoration: none;
+    color:var(--font-color);
+}
+
+body {
+    color:var(--font-color);
+}
+
+h3, b, input, textarea, select, option, .form-control {
+    font-weight: 200;
+}
+
+th > b {
+    font-weight: 400;
+    color: #666;
+}
+
+.dropdown-toggle {
+    font-weight:300;
+}
+
+.dropdown-item {
+    font-weight: 200;
+}
+
+.navbar-brand {
+    font-size:1.75rem;
+    font-weight:200;
+}
+
+.product-image img {
+    width: min(100%, 100px);
+    height: 150px;
+    object-fit: contain;
+}
+
+.page-item.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color: var(--bs-success);
+    border-color: rgba(var(--bs-black-rgb),0);
+}
+
+.page-item .page-link {
+    color: #ddd;
+    background-color: var(--bs-success);
+    border-color:rgba(var(--bs-black-rgb),0);
+}
+
+.dropdown-toggle:empty::after{
+    font-size:0.7em;
+}
+
+.dropdown-toggle.bi-person-fill {
+    font-size: 1.5em;
+}
+
+.user-dropdown.dropdown-menu[data-bs-popper] {
+    text-align: right;
+    right: 0;
+    left: inherit;
+}
+
+.product {
+    transition: all 0.2s ease-in-out;
+    &:hover{
+        background-color: rgba(var(--bs-light-rgb), 0.5);
+    }
+    &.selected {
+    }
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    background-color: var(--bs-light);
+    color: var(--bs-black)
+}
+
+.nav-pills .nav-link {
+    color:var(--bs-black);
+}
+
+.col-md-6 .btn {
+    background-color: var(--bs-success);
+}
