@@ -9,7 +9,7 @@ using System.Text.Json.Serialization;
 
 namespace ProductManagement.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class ProductController : Controller
     {
         private readonly ProductService _productService;
