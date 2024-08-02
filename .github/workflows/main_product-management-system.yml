@@ -18,6 +18,12 @@ jobs:
         with:
           dotnet-version: '8.x'
 
+      - name: Install dotnet-ef tool
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Add dotnet tools to PATH
+        run: echo "::add-path::${{ runner.tool_cache }}/.dotnet/tools"
+
       - name: Restore dependencies
         run: dotnet restore ./ProductManagement/ProductManagement.sln
 
@@ -25,6 +31,8 @@ jobs:
         run: dotnet build ./ProductManagement/ProductManagement.sln --configuration Release
 
       - name: Apply migrations
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
         run: dotnet ef database update --project ./ProductManagement.DAL/ProductManagement.DAL.csproj
 
       - name: dotnet publish
