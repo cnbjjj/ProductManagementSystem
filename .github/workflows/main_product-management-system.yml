@@ -30,7 +30,7 @@ jobs:
       - name: Build with dotnet
         run: dotnet build ./ProductManagement/ProductManagement.sln --configuration Release
 
-      - name: Debugging: Print Connection String
+      - name: Debugging
         run: echo ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
 
       - name: Apply migrations
