@@ -33,7 +33,7 @@ jobs:
       - name: Apply migrations
         env:
           ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
-        run: dotnet ef database update --project ./ProductManagement.DAL/ProductManagement.DAL.csproj
+        run: dotnet ef database update --startup-project ./ProductManagement/ProductManagement.csproj --project ./ProductManagement.DAL/ProductManagement.DAL.csproj
 
       - name: dotnet publish
         run: dotnet publish ./ProductManagement/ProductManagement.sln -c Release -o "${{runner.temp}}/myapp"
