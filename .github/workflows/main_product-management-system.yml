@@ -18,8 +18,14 @@ jobs:
         with:
           dotnet-version: '8.x'
 
+      - name: Restore dependencies
+        run: dotnet restore ./ProductManagement/ProductManagement.sln
+
       - name: Build with dotnet
         run: dotnet build ./ProductManagement/ProductManagement.sln --configuration Release
+
+      - name: Apply migrations
+        run: dotnet ef database update --project ./ProductManagement.DAL/ProductManagement.DAL.csproj
 
       - name: dotnet publish
         run: dotnet publish ./ProductManagement/ProductManagement.sln -c Release -o "${{runner.temp}}/myapp"
