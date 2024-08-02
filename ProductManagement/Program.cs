@@ -17,8 +17,11 @@ namespace ProductManagement
             .AddEntityFrameworkStores<ProductManagementContext>()
             .AddDefaultUI();
 
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                              ?? Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTION_STRING");
+
             builder.Services.AddDbContext<ProductManagementContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+                options.UseSqlServer(connectionString)
             );
 
             builder.Services.AddScoped<ProductDAL>();
