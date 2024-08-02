@@ -30,6 +30,9 @@ jobs:
       - name: Build with dotnet
         run: dotnet build ./ProductManagement/ProductManagement.sln --configuration Release
 
+      - name: Debugging: Print Connection String
+        run: echo ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
+
       - name: Apply migrations
         env:
           ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
