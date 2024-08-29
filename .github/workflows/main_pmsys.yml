@@ -1,7 +1,7 @@
 name: Build and deploy ASP.Net Core app to Azure Web App
 
 env:
-  PROJECT_NAME: 'ProductManagementSystem'
+  PROJECT_NAME: 'ProductManagement'
   APP_NAME: 'Pmsys'
   DOTNET_VERSION: '8.x'
   CONFIGURATION: 'Release'
