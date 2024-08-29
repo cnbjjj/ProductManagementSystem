@@ -38,7 +38,7 @@ jobs:
         run: dotnet build ./${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.sln --configuration ${{ env.CONFIGURATION }}
 
       - name: Apply migrations (if enabled)
-        if: ${{ env.RUN_MIGRATIONS == 'true' }}
+        if: env.RUN_MIGRATIONS == true
         env:
           ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
         run: dotnet ef database update --startup-project ./${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj --project ./${{ env.PROJECT_NAME }}.DAL/${{ env.PROJECT_NAME }}.DAL.csproj
