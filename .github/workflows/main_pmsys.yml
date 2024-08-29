@@ -7,7 +7,6 @@ env:
   CONFIGURATION: 'Release'
   SLOT_NAME: 'Production'
   RUN_MIGRATIONS: false
-  SLN: ''
 
 on:
   push:
@@ -18,10 +17,6 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    env:
-      SLN: ${{env.PROJECT_NAME}}/${{env.PROJECT_NAME}}.sln
-      START: ${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj
-      DAL: ${{ env.PROJECT_NAME }}.DAL/${{ env.PROJECT_NAME }}.DAL.csproj
     steps:
       - uses: actions/checkout@v4
 
@@ -40,16 +35,16 @@ jobs:
         run: dotnet restore ./${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.sln
 
       - name: Build with dotnet
-        run: dotnet build ./${{ env.SLN }} --configuration ${{ env.CONFIGURATION }}
+        run: dotnet build ./${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.sln --configuration ${{ env.CONFIGURATION }}
 
       - name: Apply migrations (if enabled)
         if: ${{ env.RUN_MIGRATIONS }} == 'true'
         env:
           ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
-        run: dotnet ef database update --startup-project ./${{ env.START }} --project ./${{ env.DAL }}
+        run: dotnet ef database update --startup-project ./${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj --project ./${{ env.PROJECT_NAME }}.DAL/${{ env.PROJECT_NAME }}.DAL.csproj
 
       - name: dotnet publish
-        run: dotnet publish ./${{ env.START }} -c ${{ env.CONFIGURATION }} -o "${{ runner.temp }}/${{ env.APP_NAME }}"
+        run: dotnet publish ./${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.sln -c ${{ env.CONFIGURATION }} -o "${{ runner.temp }}/${{ env.APP_NAME }}"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
