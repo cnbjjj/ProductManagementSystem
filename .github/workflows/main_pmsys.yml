@@ -1,8 +1,15 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
+name: Build and deploy ASP.Net Core app to Azure Web App
 
-name: Build and deploy ASP.Net Core app to Azure Web App - Pmsys
-
+env:
+  PROJECT_NAME: 'ProductManagementSystem'
+  APP_NAME: 'Pmsys'
+  SLN_PATH: ${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.sln
+  STARTUP_PROJECT: ${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj
+  DAL_PROJECT: ${{ env.PROJECT_NAME }}.DAL/${{ env.PROJECT_NAME }}.DAL.csproj
+  DOTNET_VERSION: '8.x'
+  CONFIGURATION: 'Release'
+  SLOT_NAME: 'Production'
+  RUN_MIGRATIONS: false
 on:
   push:
     branches:
@@ -12,30 +19,45 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up .NET Core
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.x'
-          include-prerelease: true
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install dotnet-ef tool
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Add dotnet tools to PATH
+        run: echo "${{ runner.tool_cache }}/.dotnet/tools" >> $GITHUB_PATH
+
+      - name: Restore dependencies
+        run: dotnet restore ./${{ env.SLN_PATH }}
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build ./${{ env.SLN_PATH }} --configuration ${{ env.CONFIGURATION }}
+
+      - name: Apply migrations (if enabled)
+        if: ${{ env.RUN_MIGRATIONS }} == 'true'
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
+        run: dotnet ef database update --startup-project ./${{ env.STARTUP_PROJECT }} --project ./${{ env.DAL_PROJECT }}
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish ./${{ env.SLN_PATH }} -c ${{ env.CONFIGURATION }} -o "${{ runner.temp }}/${{ env.APP_NAME }}"
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          name: ${{ env.APP_NAME }}-artifact
+          path: ${{ runner.temp }}/${{ env.APP_NAME }}
+
 
   deploy:
     runs-on: windows-latest
+
     needs: build
     environment:
       name: 'Production'
@@ -43,15 +65,15 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: .net-app
+          name: ${{ env.APP_NAME }}-artifact
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
-          app-name: 'Pmsys'
-          slot-name: 'Production'
+          app-name: ${{ env.APP_NAME }}
+          slot-name: ${{ env.SLOT_NAME }}
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3D4DE3D17F114E66A570CB33AEA9B4DB }}
           package: .
