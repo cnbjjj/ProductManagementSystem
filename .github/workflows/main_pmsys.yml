@@ -1,5 +1,13 @@
 name: Build and deploy ASP.Net Core app to Azure Web App
 
+env:
+  PROJECT_NAME: 'ProductManagement'
+  APP_NAME: 'Pmsys'
+  DOTNET_VERSION: '8.x'
+  CONFIGURATION: 'Release'
+  SLOT_NAME: 'Production'
+  RUN_MIGRATIONS: false
+
 on:
   push:
     branches:
@@ -9,17 +17,13 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-
-    env:
-      PROJECT_NAME: 'ProductManagementSystem'
-
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.x'
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Install dotnet-ef tool
         run: dotnet tool install --global dotnet-ef
@@ -28,24 +32,25 @@ jobs:
         run: echo "${{ runner.tool_cache }}/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Restore dependencies
-        run: dotnet restore ./ProductManagement/ProductManagement.sln
+        run: dotnet restore ./${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.sln
 
       - name: Build with dotnet
-        run: dotnet build ./ProductManagement/ProductManagement.sln --configuration Release
+        run: dotnet build ./${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.sln --configuration ${{ env.CONFIGURATION }}
 
-      - name: Apply migrations
+      - name: Apply migrations (if enabled)
+        if: env.RUN_MIGRATIONS == true
         env:
           ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
-        run: dotnet ef database update --startup-project ./ProductManagement/ProductManagement.csproj --project ./ProductManagement.DAL/ProductManagement.DAL.csproj
+        run: dotnet ef database update --startup-project ./${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj --project ./${{ env.PROJECT_NAME }}.DAL/${{ env.PROJECT_NAME }}.DAL.csproj
 
       - name: dotnet publish
-        run: dotnet publish ./ProductManagement/ProductManagement.sln -c Release -o "${{runner.temp}}/ProductManagement"
+        run: dotnet publish ./${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.sln -c ${{ env.CONFIGURATION }} -o "${{ runner.temp }}/${{ env.APP_NAME }}"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: .net-app
-          path: ${{runner.temp}}/ProductManagement
+          name: ${{ env.APP_NAME }}-artifact
+          path: ${{ runner.temp }}/${{ env.APP_NAME }}
 
   deploy:
     runs-on: windows-latest
@@ -58,13 +63,13 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: .net-app
+          name: ${{ env.APP_NAME }}-artifact
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'ProductManagementSystem'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_ADF0C426A278422597889750A9A66953 }}
+          app-name: ${{ env.APP_NAME }}
+          slot-name: ${{ env.SLOT_NAME }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3D4DE3D17F114E66A570CB33AEA9B4DB }}
           package: .
